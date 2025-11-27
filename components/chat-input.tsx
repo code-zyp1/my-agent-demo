@@ -9,14 +9,15 @@ import { ArrowUp } from "lucide-react"
 
 interface ChatInputProps {
   onSend: (message: string) => void
+  isLoading?: boolean
 }
 
-export function ChatInput({ onSend }: ChatInputProps) {
+export function ChatInput({ onSend, isLoading }: ChatInputProps) {
   const [input, setInput] = useState("")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleSend = () => {
-    if (input.trim()) {
+    if (input.trim() && !isLoading) {
       onSend(input.trim())
       setInput("")
     }
@@ -45,14 +46,15 @@ export function ChatInput({ onSend }: ChatInputProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Message AI Assistant..."
-            className="min-h-[44px] max-h-[200px] flex-1 resize-none border-0 bg-transparent px-3 py-2.5 text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+            placeholder={isLoading ? "Waiting for response..." : "Message AI Assistant..."}
+            disabled={isLoading}
+            className="min-h-[44px] max-h-[200px] flex-1 resize-none border-0 bg-transparent px-3 py-2.5 text-sm focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-50"
             rows={1}
           />
           <Button
             size="icon"
             onClick={handleSend}
-            disabled={!input.trim()}
+            disabled={!input.trim() || isLoading}
             className="h-9 w-9 shrink-0 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
           >
             <ArrowUp className="h-5 w-5" />

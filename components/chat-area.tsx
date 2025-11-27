@@ -4,10 +4,10 @@ import { useRef, useEffect } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { Bot, User } from "lucide-react"
-import type { Message } from "@/components/chat-interface"
+import type { UIMessage } from "ai"
 
 interface ChatAreaProps {
-  messages: Message[]
+  messages: UIMessage[]
 }
 
 export function ChatArea({ messages }: ChatAreaProps) {
@@ -55,7 +55,12 @@ export function ChatArea({ messages }: ChatAreaProps) {
                   : "bg-muted text-foreground max-w-[85%]",
               )}
             >
-              {message.content}
+              {message.parts.map((part, index) => {
+                if (part.type === 'text') {
+                  return <span key={index}>{part.text}</span>
+                }
+                return null
+              })}
             </div>
             {message.role === "user" && (
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary">
