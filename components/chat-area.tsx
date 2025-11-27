@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { Bot, User } from "lucide-react"
 import type { UIMessage } from "ai"
+import ReactMarkdown from 'react-markdown'
 
 interface ChatAreaProps {
   messages: UIMessage[]
@@ -21,7 +22,7 @@ export function ChatArea({ messages }: ChatAreaProps) {
 
   if (messages.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
+      <div className="flex flex-1 flex-col items-center justify-center px-4 text-center overflow-auto">
         <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
           <Bot className="h-8 w-8 text-muted-foreground" />
         </div>
@@ -35,7 +36,7 @@ export function ChatArea({ messages }: ChatAreaProps) {
   }
 
   return (
-    <ScrollArea className="flex-1">
+    <ScrollArea className="flex-1 min-h-0">
       <div className="mx-auto max-w-3xl px-4 py-6">
         {messages.map((message) => (
           <div
@@ -57,8 +58,49 @@ export function ChatArea({ messages }: ChatAreaProps) {
             >
               {message.parts.map((part, index) => {
                 if (part.type === 'text') {
-                  return <span key={index}>{part.text}</span>
+                  if (message.role === 'user') {
+                    return <span key={index}>{part.text}</span>
+                  }
+                  // AI messages with markdown + custom code block styling
+                  return (
+                    <article key={index} className="prose prose-sm dark:prose-invert break-words max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                      <ReactMarkdown
+                        components={{
+                          p({ children }: any) {
+                            return <div className="mb-2">{children}</div>
+                          },
+                          code({ inline, className, children, ...props }: any) {
+                            const match = /language-(\w+)/.exec(className || '')
+                            return !inline ? (
+                              <div className="relative my-4 rounded-lg bg-zinc-900 overflow-hidden">
+                                {match && (
+                                  <div className="px-4 py-2 text-xs text-zinc-400 bg-zinc-800 border-b border-zinc-700">
+                                    {match[1]}
+                                  </div>
+                                )}
+                                <pre className="p-4 overflow-x-auto">
+                                  <code className={cn("text-sm text-zinc-100", className)}>
+                                    {children}
+                                  </code>
+                                </pre>
+                              </div>
+                            ) : (
+                              <code className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-100 text-xs" {...props}>
+                                {children}
+                              </code>
+                            )
+                          },
+                          pre({ children }: any) {
+                            return <>{children}</>
+                          }
+                        }}
+                      >
+                        {part.text}
+                      </ReactMarkdown>
+                    </article>
+                  )
                 }
+
                 return null
               })}
             </div>

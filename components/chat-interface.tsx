@@ -76,7 +76,7 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
+    <div className="flex h-full w-full bg-background text-foreground overflow-hidden">
       {/* Sidebar */}
       <Sidebar
         open={sidebarOpen}
@@ -89,9 +89,9 @@ export function ChatInterface() {
       />
 
       {/* Main Content */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
         {/* Header */}
-        <header className="flex h-14 items-center gap-3 border-b border-border px-4">
+        <header className="flex h-14 items-center gap-3 border-b border-border px-4 shrink-0">
           {!sidebarOpen && (
             <Button
               variant="ghost"
