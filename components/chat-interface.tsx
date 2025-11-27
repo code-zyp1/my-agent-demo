@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport } from "ai"
 import { Sidebar } from "@/components/sidebar"
@@ -22,7 +22,15 @@ const initialConversations: Conversation[] = [
   { id: "1", title: "New Chat" },
 ]
 
-export function ChatInterface() {
+interface ChatInterfaceProps {
+  initialMessages?: Array<{
+    id: string
+    role: 'user' | 'assistant'
+    parts: Array<{ type: 'text'; text: string }>
+  }>
+}
+
+export function ChatInterface({ initialMessages = [] }: ChatInterfaceProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [conversations, setConversations] = useState<Conversation[]>(initialConversations)
   const [activeConversation, setActiveConversation] = useState<string | null>("1")
@@ -36,6 +44,13 @@ export function ChatInterface() {
       console.error("Chat error:", error)
     },
   })
+
+  // 初始化历史消息
+  useEffect(() => {
+    if (initialMessages.length > 0) {
+      setMessages(initialMessages as any)
+    }
+  }, [])
 
   const isLoading = status === "submitted" || status === "streaming"
 
