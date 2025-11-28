@@ -15,7 +15,13 @@ export default async function Home() {
     .order('created_at', { ascending: true })
 
   if (error) {
-    console.error('Failed to load messages:', error)
+    console.error('Failed to load messages:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    })
+    // 即使加载失败，也返回空数组，不阻塞页面渲染
   }
 
   // 将 Supabase 数据映射成 UIMessage 格式

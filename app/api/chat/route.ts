@@ -170,7 +170,8 @@ ${contextInfo}
 
             // onFinish 回调：保存 AI 响应
             onFinish: async ({ text }: { text: string }) => {
-                console.log('[onFinish] Final text:', text);
+                // console.log('[onFinish] Final text:', text);
+                console.log('[onFinish] ');
 
                 try {
                     // 只有当有文本内容时才保存

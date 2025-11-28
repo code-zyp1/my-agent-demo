@@ -78,11 +78,32 @@ export function ChatInterface({ initialMessages = [] }: ChatInterfaceProps) {
     }
   }
 
-  const handleDeleteConversation = (id: string) => {
-    setConversations(conversations.filter((c) => c.id !== id))
-    if (activeConversation === id) {
-      setActiveConversation(null)
-      setMessages([])
+  const handleDeleteConversation = async (id: string) => {
+    // 添加确认框
+    const confirmed = window.confirm('确定要清空所有对话记录吗？此操作不可恢复。')
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      // 调用清空 API
+      const response = await fetch('/api/chat/clear', {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to clear messages')
+      }
+
+      // 清空成功后，删除对话并清空消息
+      setConversations(conversations.filter((c) => c.id !== id))
+      if (activeConversation === id) {
+        setActiveConversation(null)
+        setMessages([])
+      }
+    } catch (error) {
+      console.error('Failed to clear chat:', error)
+      alert('清空对话失败，请重试')
     }
   }
 
