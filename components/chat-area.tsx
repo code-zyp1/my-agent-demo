@@ -4,8 +4,14 @@ import { useRef, useEffect } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { Bot, User } from "lucide-react"
-import type { UIMessage, ToolInvocation } from "ai"
+import type { UIMessage } from "ai"
 import ReactMarkdown from 'react-markdown'
+
+interface ToolInvocation {
+  toolName: string
+  args: Record<string, any>
+  result?: any
+}
 
 interface ChatAreaProps {
   messages: UIMessage[]
@@ -104,8 +110,8 @@ export function ChatArea({ messages }: ChatAreaProps) {
                 if (part.type === 'tool-invocation') {
                   // const toolInvocation = part.toolInvocation
                   const toolInvocation = ('toolInvocation' in part
-                    ? (part as { toolInvocation: ToolInvocation }).toolInvocation
-                    : (part as unknown as ToolInvocation));
+                    ? part.toolInvocation
+                    : part) as ToolInvocation;
                   return (
                     <div key={index} className="my-2 p-2 rounded bg-muted/50 text-xs font-mono border border-border">
                       <div className="flex items-center gap-2 text-muted-foreground mb-1">
