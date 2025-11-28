@@ -1,11 +1,18 @@
-import { streamText, tool, convertToModelMessages } from 'ai';
+import { streamText, tool, convertToModelMessages, stepCountIs, embed } from 'ai';
 import { createDeepSeek } from '@ai-sdk/deepseek';
+import { createOpenAI } from '@ai-sdk/openai';
 import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 // 1. 创建 DeepSeek Provider
 const deepseek = createDeepSeek({
     apiKey: process.env.DEEPSEEK_API_KEY ?? '',
+});
+
+// 1.5. 创建智谱 AI Provider (用于 Embedding)
+const zhipu = createOpenAI({
+    apiKey: process.env.ZHIPU_API_KEY ?? '',
+    baseURL: 'https://open.bigmodel.cn/api/paas/v4',
 });
 
 // 2. 初始化 Supabase 客户端
@@ -24,21 +31,22 @@ export async function POST(request: Request) {
         // 提取最后一条用户消息
         const lastMessage = messages[messages.length - 1];
 
+        // 提取用户文本内容（用于保存和 RAG 检索）
+        let userContent = '';
+        if (lastMessage && lastMessage.role === 'user') {
+            if (typeof lastMessage.content === 'string') {
+                userContent = lastMessage.content;
+            } else if (Array.isArray(lastMessage.parts)) {
+                userContent = lastMessage.parts
+                    .filter((part: { type: string; text?: string }) => part.type === 'text')
+                    .map((part: { type: string; text?: string }) => part.text || '')
+                    .join('');
+            }
+        }
+
         // 保存用户消息到数据库
         if (lastMessage && lastMessage.role === 'user') {
             try {
-                // 提取文本内容
-                let userContent = '';
-                if (typeof lastMessage.content === 'string') {
-                    userContent = lastMessage.content;
-                } else if (Array.isArray(lastMessage.parts)) {
-                    // 如果是 UIMessage 格式，从 parts 提取文本
-                    userContent = lastMessage.parts
-                        .filter((part: { type: string; text?: string }) => part.type === 'text')
-                        .map((part: { type: string; text?: string }) => part.text || '')
-                        .join('');
-                }
-
                 const { error } = await supabase
                     .from('messages')
                     .insert({
@@ -55,11 +63,71 @@ export async function POST(request: Request) {
             }
         }
 
-        // 调用 streamText（原生支持 onFinish）
+        // ========== RAG 检索逻辑 ==========
+        let contextInfo = '';
+
+        if (userContent) {
+            try {
+                // 1. 使用智谱 AI 生成用户问题的 Embedding
+                const { embedding } = await embed({
+                    model: zhipu.embedding('embedding-3'),
+                    value: userContent,
+                });
+
+                console.log('[RAG] Generated embedding for user query');
+
+                // 2. 使用向量搜索查询相似文档
+                const { data: documents, error: searchError } = await supabase.rpc('match_documents', {
+                    query_embedding: embedding,
+                    match_threshold: 0,
+                    match_count: 5,
+                });
+
+                if (searchError) {
+                    console.error('[RAG] Vector search error:', searchError);
+                } else if (documents && documents.length > 0) {
+                    console.log(`[RAG] Found ${documents.length} relevant documents`);
+
+                    // 3. 拼接文档内容作为上下文
+                    contextInfo = documents
+                        .map((doc: any) => doc.content)
+                        .filter((content: string) => content && content.trim())
+                        .join('\n\n');
+
+                    console.log('[RAG] Final contextInfo length:', contextInfo.length);
+                } else {
+                    console.log('[RAG] No relevant documents found');
+                }
+            } catch (err) {
+                console.error('[RAG] Error during retrieval:', err);
+            }
+        }
+
+        // ========== 动态构建 System Prompt ==========
+        let systemPrompt = '你是一个拥有10年经验的资深工程师，性格毒舌但专业。回答问题时，请直接给出代码方案，并嘲讽一下过时的技术。';
+
+        // RAG 注入状态（搜到简历时）
+        if (contextInfo) {
+            console.log('[RAG] ✅ contextInfo is valid, injecting into prompt');
+            systemPrompt = `你是一个求职者，正在接受面试官的提问。
+
+你的简历信息：
+${contextInfo}
+
+回答规则：
+- 使用第一人称"我"来回答
+- 只回答简历中有的内容
+- 如果需要获取额外信息（如天气），直接调用工具，不要说"我来帮你查"等废话
+- 工具调用后，必须基于结果生成完整的自然语言回复`;
+        } else {
+            console.log('[RAG] ❌ contextInfo is empty, using fallback prompt');
+        }
+
+        // 调用 streamText
         const result = streamText({
             model: deepseek('deepseek-chat'),
             messages: convertToModelMessages(messages),
-            system: '你是一个拥有10年经验的资深工程师，性格毒舌但专业。回答问题时，请直接给出代码方案，并嘲讽一下过时的技术。',
+            system: systemPrompt,
 
             // 工具定义
             tools: {
@@ -97,19 +165,27 @@ export async function POST(request: Request) {
                 }),
             },
 
+            // 启用多步执行：允许模型在调用工具后继续生成回复
+            stopWhen: stepCountIs(5),
+
             // onFinish 回调：保存 AI 响应
             onFinish: async ({ text }: { text: string }) => {
-                try {
-                    const { error } = await supabase
-                        .from('messages')
-                        .insert({
-                            role: 'assistant',
-                            content: text,
-                            created_at: new Date().toISOString(),
-                        });
+                console.log('[onFinish] Final text:', text);
 
-                    if (error) {
-                        console.error('Failed to save assistant message:', error);
+                try {
+                    // 只有当有文本内容时才保存
+                    if (text && text.trim().length > 0) {
+                        const { error } = await supabase
+                            .from('messages')
+                            .insert({
+                                role: 'assistant',
+                                content: text,
+                                created_at: new Date().toISOString(),
+                            });
+
+                        if (error) {
+                            console.error('Failed to save assistant message:', error);
+                        }
                     }
                 } catch (err) {
                     console.error('Error saving assistant message:', err);

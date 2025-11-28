@@ -101,6 +101,29 @@ export function ChatArea({ messages }: ChatAreaProps) {
                   )
                 }
 
+                if (part.type === 'tool-invocation') {
+                  const toolInvocation = part.toolInvocation
+                  return (
+                    <div key={index} className="my-2 p-2 rounded bg-muted/50 text-xs font-mono border border-border">
+                      <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                        <span className="w-3 h-3">🔧</span>
+                        <span>Calling: {toolInvocation.toolName}</span>
+                      </div>
+                      <div className="overflow-x-auto whitespace-pre-wrap text-muted-foreground/80">
+                        {JSON.stringify(toolInvocation.args, null, 2)}
+                      </div>
+                      {'result' in toolInvocation && (
+                        <div className="mt-2 pt-2 border-t border-border/50">
+                          <div className="text-green-600/80 dark:text-green-400/80 mb-1">Result:</div>
+                          <div className="overflow-x-auto whitespace-pre-wrap text-muted-foreground/80">
+                            {JSON.stringify(toolInvocation.result, null, 2)}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+
                 return null
               })}
             </div>
