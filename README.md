@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Chat Assistant with RAG
 
-## Getting Started
+基于 Next.js 构建的智能聊天助手，集成 RAG（检索增强生成）和 Function Calling 功能。
 
-First, run the development server:
+## 技术栈
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 15 (App Router)
+- Vercel AI SDK
+- Supabase (PostgreSQL + pgvector)
+- shadcn/ui + Tailwind CSS
+
+## 项目结构
+
+```
+├── app/
+│   ├── api/chat/
+│   │   ├── route.ts          # 聊天 API (RAG + Function Calling)
+│   │   └── clear/route.ts    # 清空对话 API
+│   └── page.tsx              # 主页面
+├── components/
+│   ├── chat-interface.tsx    # 聊天界面
+│   ├── chat-area.tsx         # 消息显示
+│   ├── chat-input.tsx        # 输入框
+│   └── sidebar.tsx           # 侧边栏
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 快速开始
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. 安装依赖
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+```
 
-## Learn More
+### 2. 配置环境变量
 
-To learn more about Next.js, take a look at the following resources:
+创建 `.env.local` 文件：
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## 主要功能
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- RAG 检索增强生成（基于 Supabase 向量搜索）
+- 多步 Function Calling（使用 `stopWhen(stepCountIs(5))`）
+- 对话历史持久化
+- 实时流式响应
