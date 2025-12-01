@@ -72,11 +72,16 @@ const config: Config = {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
             },
+            fontFamily: {
+                zpix: ["var(--font-zpix)", "monospace"],
+                pixel: ["var(--font-press-start-2p)", "cursive"],
+                mono: ["var(--font-vt323)", "monospace"],
+            },
         },
     },
     plugins: [
         require("tailwindcss-animate"),
-        require("@tailwindcss/typography"), // ✅ 这是我们这次新增的核心插件
+        require("@tailwindcss/typography"),
     ],
 };
 

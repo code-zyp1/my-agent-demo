@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { Geist, Geist_Mono, Press_Start_2P, VT323, Noto_Sans_SC } from "next/font/google";
 import "./globals.css";
+
+const zpix = localFont({
+  src: "../public/fonts/zpix.ttf",
+  variable: "--font-zpix",
+  display: "swap",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -10,6 +17,24 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const pressStart2P = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-press-start-2p",
+});
+
+const vt323 = VT323({
+  weight: "400",
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-vt323",
+});
+
+const notoSansSC = Noto_Sans_SC({
+  weight: ["400", "500"],
+  subsets: ["latin"],
+  variable: "--font-noto-sans-sc",
 });
 
 export const metadata: Metadata = {
@@ -23,9 +48,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable} ${vt323.variable} ${notoSansSC.variable} ${zpix.variable} antialiased`}
       >
         {children}
       </body>

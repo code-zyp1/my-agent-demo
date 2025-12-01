@@ -1,4 +1,5 @@
-import { ChatInterface } from "@/components/chat-interface"
+import { HandheldConsole } from "@/components/console/handheld-console"
+import { IsometricBackground } from "@/components/console/isometric-background"
 import { createClient } from '@supabase/supabase-js'
 
 // 初始化 Supabase 客户端
@@ -37,8 +38,11 @@ export default async function Home() {
   })) || []
 
   return (
-    <div className="dark h-screen w-full overflow-hidden">
-      <ChatInterface initialMessages={initialMessages} />
+    <div className="dark h-screen w-full overflow-hidden flex items-center justify-center">
+      <IsometricBackground />
+      <div className="relative z-10">
+        <HandheldConsole initialMessages={initialMessages} />
+      </div>
     </div>
   )
 }
