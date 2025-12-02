@@ -13,10 +13,11 @@ This project has been migrated to a new "Handheld Console" pixel art UI.
 - **Tech Stack**: Next.js, Tailwind CSS, Framer Motion, Vercel AI SDK.
 
 ## 📁 Project Structure
-- `components/handheld-console.tsx`: Main container component.
-- `components/chat-screen.tsx`: Chat message display and input area.
-- `components/isometric-background.tsx`: Animated background.
-- `public/fonts/zpix.ttf`: Local pixel font file.
+- `components/console/`: Hardware UI (handheld shell, buttons, d-pad, background)
+- `components/chat/`: Chat interface (screen, avatar, typewriter)
+- `components/modals/`: Popup dialogs (confirm, profile)
+- `components/ui/`: Generic Shadcn components
+- `public/fonts/zpix.ttf`: Local pixel font file
 
 ## 🚀 Getting Started
 1. **Install Dependencies**:
