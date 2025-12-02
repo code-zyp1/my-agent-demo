@@ -48,7 +48,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="pixel-text text-[10px] text-gray-800">PIXEL DEV</h2>
+                  <h2 className="pixel-text text-[10px] text-gray-800">Zhong Yongpeng</h2>
                   <p className="pixel-text text-[6px] text-gray-600 mt-1">Full-Stack Developer</p>
                 </div>
               </div>
@@ -65,7 +65,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-2 mb-4">
               {[
-                { label: "EXP", value: "5 YRS" },
+                { label: "EXP", value: "3.5 YRS" },
                 { label: "PROJECTS", value: "50+" },
                 { label: "LEVEL", value: "SR" },
               ].map((stat) => (
@@ -80,7 +80,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
             <div className="space-y-2 mb-4">
               <div className="flex items-center gap-2 text-gray-700">
                 <MapPin className="w-3 h-3" />
-                <span className="pixel-text text-[7px]">San Francisco, CA</span>
+                <span className="pixel-text text-[7px]">Shenzhen or Shanghai</span>
               </div>
               <div className="flex items-center gap-2 text-gray-700">
                 <Briefcase className="w-3 h-3" />
@@ -92,7 +92,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
             <div className="mb-4">
               <div className="pixel-text text-[6px] text-gray-500 mb-2">SKILLS</div>
               <div className="flex flex-wrap gap-1">
-                {["React", "TypeScript", "Next.js", "Node.js", "Python", "AWS"].map((skill) => (
+                {["React", "TypeScript", "Next.js", "Node.js"].map((skill) => (
                   <span key={skill} className="pixel-text text-[6px] bg-[#00b894] text-white px-2 py-1 rounded">
                     {skill}
                   </span>
@@ -103,19 +103,26 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
             {/* Social Links */}
             <div className="flex justify-center gap-3">
               {[
-                { icon: Github, color: "#2d3436" },
-                { icon: Linkedin, color: "#0077b5" },
-                { icon: Mail, color: "#e74c3c" },
-              ].map(({ icon: Icon, color }, index) => (
-                <motion.button
+                { icon: Github, color: "#2d3436", href: "https://github.com/code-zyp1" },
+                { icon: Linkedin, color: "#0077b5", href: "https://linkedin.com" },
+                { icon: Mail, color: "#e74c3c", href: "mailto:zypzhong@qq.com" },
+              ].map(({ icon: Icon, color, href }, index) => (
+                <a
                   key={index}
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center shadow-md"
-                  style={{ backgroundColor: color }}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
                 >
-                  <Icon className="w-4 h-4 text-white" />
-                </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shadow-md"
+                    style={{ backgroundColor: color }}
+                  >
+                    <Icon className="w-4 h-4 text-white" />
+                  </motion.button>
+                </a>
               ))}
             </div>
           </div>

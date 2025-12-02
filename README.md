@@ -1,47 +1,42 @@
-# AI Chat Assistant with RAG
+# AI Agent Demo (Pixel Art Edition)
 
-基于 Next.js 构建的智能聊天助手，集成 RAG（检索增强生成）和 Function Calling 功能。
+基于 Next.js 构建的智能聊天助手，集成 RAG（检索增强生成）、Function Calling 功能，并采用独特的**像素艺术（Pixel Art）**风格 UI。
 
-## 技术栈
+## ✨ 特性
 
-- Next.js 15 (App Router)
-- Vercel AI SDK
-- Supabase (PostgreSQL + pgvector)
-- shadcn/ui + Tailwind CSS
+-   **🎨 像素艺术 UI**: 复古掌机风格界面，定制像素字体（Zpix），CRT 扫描线效果，以及像素风格的头像和图标。
+-   **🧠 智能对话**: 集成 Vercel AI SDK，支持流式响应和多轮对话。
+-   **📚 RAG 检索增强**: 基于 Supabase pgvector 实现知识库检索，让 AI 回答更准确。
+-   **🛠️ Function Calling**: 支持多步工具调用（如查询天气、数据库操作等）。
+-   **💾 数据库管理自动化**: 内置脚本用于数据库的初始化、重置和数据填充。
 
-## 项目结构
+## 🛠️ 技术栈
+
+-   **Framework**: Next.js 15 (App Router)
+-   **AI SDK**: Vercel AI SDK
+-   **Database**: Supabase (PostgreSQL + pgvector)
+-   **UI**: Tailwind CSS + Framer Motion + shadcn/ui
+-   **Fonts**: Zpix (像素字体), Geist, Press Start 2P
+
+## 📂 项目结构
 
 ```
-├── app/
-│   ├── api/chat/             # API 路由层 (仅处理请求流程)
-│   │   ├── route.ts          # 聊天主入口
-│   │   └── clear/route.ts    # 清空对话入口
-│   └── page.tsx              # 主页面
-├── lib/                      # 核心逻辑层
-│   ├── ai/                   # AI 相关逻辑
-│   │   ├── prompts.ts        # System Prompt 管理
-│   │   ├── rag-service.ts    # RAG 检索服务 (Embedding + Search)
-│   │   └── tools.ts          # Function Calling 工具定义
-│   ├── services/             # 业务服务层
-│   │   └── message-service.ts # 数据库交互 (CRUD)
-│   └── supabase.ts           # Supabase 客户端单例
-├── components/               # UI 组件层
-│   ├── chat-interface.tsx    # 聊天主界面
-│   ├── chat-area.tsx         # 消息列表
-│   ├── chat-input.tsx        # 输入区域
-│   └── sidebar.tsx           # 侧边栏
+├── app/                  # Next.js 应用路由
+├── components/           # UI 组件
+│   ├── chat/             # 聊天相关组件 (PixelAvatar, etc.)
+│   ├── modals/           # 模态框 (ProfileModal, etc.)
+│   └── ui/               # 基础 UI 组件
+├── lib/                  # 核心逻辑
+│   ├── ai/               # AI 相关 (RAG, Tools, Prompts)
+│   └── services/         # 业务服务
+├── scripts/              # 数据库管理脚本
+│   ├── db-manager.ts     # 数据库操作核心逻辑
+│   ├── seed.ts           # 数据填充脚本
+│   └── schema.sql        # 数据库 Schema
+└── public/               # 静态资源 (字体, 图片)
 ```
 
-## 架构说明
-
-本项目采用了分层架构设计，以提高代码的可维护性和可扩展性：
-
-1.  **API Layer (`app/api`)**: 负责处理 HTTP 请求，流程控制，以及连接 AI SDK 和业务服务。不包含具体的业务逻辑或数据库操作。
-2.  **Service Layer (`lib/services`)**: 封装具体的业务逻辑和数据库交互（如消息的增删改查）。
-3.  **AI Layer (`lib/ai`)**: 封装 AI 相关的核心逻辑，包括 RAG 检索流程、工具定义和提示词管理。
-4.  **UI Layer (`components`)**: 负责前端展示和交互。
-
-## 快速开始
+## 🚀 快速开始
 
 ### 1. 安装依赖
 
@@ -51,13 +46,50 @@ npm install
 
 ### 2. 配置环境变量
 
-创建 `.env.local` 文件：
+复制 `.env.example` (如果存在) 或创建 `.env.local` 并填入以下内容：
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# AI Provider (e.g., OpenAI, DeepSeek)
+OPENAI_API_KEY=your_api_key
+```
+
+### 3. 初始化数据库
+
+本项目包含自动化的数据库管理脚本。
+
+**首次设置 (重置数据库并填充数据):**
+
+```bash
+npm run db:setup
+```
+
+**仅重建 Schema (保留数据):**
+
+```bash
+npm run db:rebuild
+```
+
+**仅填充数据:**
+
+```bash
+npm run db:seed
+```
+
+### 4. 启动开发服务器
+
+```bash
+npm run dev
+```
+
+访问 [http://localhost:3000](http://localhost:3000) 查看效果。
 
 
 
-## 主要功能
+## 📝 License
 
-- RAG 检索增强生成（基于 Supabase 向量搜索）
-- 多步 Function Calling（使用 `stopWhen(stepCountIs(5))`）
-- 对话历史持久化
-- 实时流式响应
+MIT
