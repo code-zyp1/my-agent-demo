@@ -2,6 +2,7 @@ import { tool } from 'ai';
 import { z } from 'zod';
 
 export const ALL_TOOLS = {
+    // 获取天气工具
     getWeather: tool({
         description: 'Get the current weather for a specific city',
         inputSchema: z.object({

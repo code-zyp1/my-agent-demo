@@ -13,16 +13,33 @@
 
 ```
 ├── app/
-│   ├── api/chat/
-│   │   ├── route.ts          # 聊天 API (RAG + Function Calling)
-│   │   └── clear/route.ts    # 清空对话 API
+│   ├── api/chat/             # API 路由层 (仅处理请求流程)
+│   │   ├── route.ts          # 聊天主入口
+│   │   └── clear/route.ts    # 清空对话入口
 │   └── page.tsx              # 主页面
-├── components/
-│   ├── chat-interface.tsx    # 聊天界面
-│   ├── chat-area.tsx         # 消息显示
-│   ├── chat-input.tsx        # 输入框
+├── lib/                      # 核心逻辑层
+│   ├── ai/                   # AI 相关逻辑
+│   │   ├── prompts.ts        # System Prompt 管理
+│   │   ├── rag-service.ts    # RAG 检索服务 (Embedding + Search)
+│   │   └── tools.ts          # Function Calling 工具定义
+│   ├── services/             # 业务服务层
+│   │   └── message-service.ts # 数据库交互 (CRUD)
+│   └── supabase.ts           # Supabase 客户端单例
+├── components/               # UI 组件层
+│   ├── chat-interface.tsx    # 聊天主界面
+│   ├── chat-area.tsx         # 消息列表
+│   ├── chat-input.tsx        # 输入区域
 │   └── sidebar.tsx           # 侧边栏
 ```
+
+## 架构说明
+
+本项目采用了分层架构设计，以提高代码的可维护性和可扩展性：
+
+1.  **API Layer (`app/api`)**: 负责处理 HTTP 请求，流程控制，以及连接 AI SDK 和业务服务。不包含具体的业务逻辑或数据库操作。
+2.  **Service Layer (`lib/services`)**: 封装具体的业务逻辑和数据库交互（如消息的增删改查）。
+3.  **AI Layer (`lib/ai`)**: 封装 AI 相关的核心逻辑，包括 RAG 检索流程、工具定义和提示词管理。
+4.  **UI Layer (`components`)**: 负责前端展示和交互。
 
 ## 快速开始
 

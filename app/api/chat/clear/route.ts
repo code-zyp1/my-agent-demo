@@ -3,6 +3,7 @@ import { clearAllMessages } from '@/lib/services/message-service';
 
 export async function DELETE() {
     try {
+        // 调用服务层清空所有消息
         await clearAllMessages();
         return NextResponse.json({ success: true });
     } catch (error) {

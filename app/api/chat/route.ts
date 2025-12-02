@@ -21,6 +21,7 @@ export async function POST(request: Request) {
         const lastMessage = messages[messages.length - 1];
 
         // 提取用户文本内容（用于保存和 RAG 检索）
+        // 支持纯文本和多模态消息结构
         let userContent = '';
         if (lastMessage && lastMessage.role === 'user') {
             if (typeof lastMessage.content === 'string') {
@@ -43,9 +44,11 @@ export async function POST(request: Request) {
         }
 
         // ========== RAG 检索逻辑 ==========
+        // 根据用户问题获取相关上下文
         const contextInfo = await getContext(userContent);
 
         // ========== 动态构建 System Prompt ==========
+        // 根据是否有上下文，切换不同的系统提示词
         const systemPrompt = GET_SYSTEM_PROMPT(contextInfo);
 
         if (contextInfo) {
@@ -63,7 +66,7 @@ export async function POST(request: Request) {
             // 工具定义
             tools: ALL_TOOLS,
 
-            // 启用多步执行：允许模型在调用工具后继续生成回复
+            // 启用多步执行：允许模型在调用工具后继续生成回复 (最大 5 步)
             stopWhen: stepCountIs(5),
 
             // onFinish 回调：保存 AI 响应
